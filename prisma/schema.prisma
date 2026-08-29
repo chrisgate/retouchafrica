@@ -1,0 +1,162 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum SocialPlatform {
+  INSTAGRAM
+  FACEBOOK
+  TIKTOK
+  YOUTUBE
+  TWITTER
+  LINKEDIN
+  OTHER
+}
+
+enum SubmissionType {
+  CONTACT
+  JOIN_COMMUNITY
+  PARTNER_INQUIRY
+}
+
+enum SubmissionStatus {
+  NEW
+  READ
+  ARCHIVED
+}
+
+model AdminUser {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  passwordHash  String
+  isSuperAdmin  Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model SiteSettings {
+  id Int @id @default(1)
+
+  heroEyebrow  String  @default("WELCOME TO")
+  heroTitle    String  @default("RETOUCH AFRICA")
+  heroTagline  String  @default("Elevating the art of retouching across Africa.")
+  heroBody     String  @default("")
+  heroImageUrl String?
+  heroVideoUrl String?
+
+  storyEyebrow String @default("OUR STORY")
+  storyHeading String @default("A Community. A Vision. A Movement.")
+  storyBody    String @default("")
+
+  missionTitle String @default("OUR MISSION")
+  missionBody  String @default("")
+  visionTitle  String @default("OUR VISION")
+  visionBody   String @default("")
+  impactTitle  String @default("OUR IMPACT")
+  impactBody   String @default("")
+
+  footerHeading   String  @default("Be Part of Africa's Retouching Future")
+  footerBody      String  @default("")
+  contactEmail    String  @default("helloretouchafrica@gmail.com")
+  contactHandle   String  @default("@retouch_africa")
+  secondaryHandle String? @default("@theretouchafrica")
+  copyrightLine   String  @default("© 2026 Retouch Africa. All Rights Reserved.")
+
+  updatedAt DateTime @updatedAt
+}
+
+model SocialLink {
+  id       String         @id @default(cuid())
+  platform SocialPlatform
+  url      String
+  order    Int            @default(0)
+
+  facilitatorId String?
+  facilitator   Facilitator? @relation(fields: [facilitatorId], references: [id], onDelete: Cascade)
+
+  @@index([facilitatorId])
+}
+
+model Workshop {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  title         String
+  eyebrow       String   @default("UPCOMING WORKSHOP")
+  summary       String
+  description   String
+  durationLabel String   @default("3 DAYS")
+  locationLabel String
+  venueLabel    String?
+  seatsLabel    String   @default("LIMITED SEATS")
+  startDate     DateTime
+  endDate       DateTime?
+  registerUrl   String?
+  heroImageUrl  String?
+  galleryImages String[] @default([])
+  isFeatured    Boolean  @default(false)
+  isPublished   Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([isFeatured])
+  @@index([isPublished])
+}
+
+model Facilitator {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  role        String
+  bio         String
+  photoUrl    String?
+  order       Int      @default(0)
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  socialLinks SocialLink[]
+
+  @@index([isPublished])
+}
+
+model GalleryImage {
+  id          String   @id @default(cuid())
+  imageUrl    String
+  caption     String?
+  category    String?
+  order       Int      @default(0)
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  @@index([isPublished])
+}
+
+model Partner {
+  id          String   @id @default(cuid())
+  name        String
+  logoUrl     String
+  websiteUrl  String?
+  order       Int      @default(0)
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  @@index([isPublished])
+}
+
+model Submission {
+  id        String           @id @default(cuid())
+  type      SubmissionType
+  name      String
+  email     String
+  phone     String?
+  message   String?
+  metadata  Json?
+  status    SubmissionStatus @default(NEW)
+  createdAt DateTime         @default(now())
+
+  @@index([type])
+  @@index([status])
+}
