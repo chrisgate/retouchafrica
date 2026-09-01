@@ -101,7 +101,7 @@ lib/
 prisma/
   schema.prisma, seed.ts, migrations/
 public/uploads/  (gitignored; bind-mounted volume in production)
-Dockerfile, docker-compose.yml, docker-entrypoint.sh, .env.example, middleware.ts
+Dockerfile, docker-compose.yaml, docker-entrypoint.sh, .env.example, middleware.ts
 next.config.ts (output: "standalone")
 ```
 
@@ -138,7 +138,7 @@ Use `@gsap/react`'s `useGSAP(() => {...}, { scope: containerRef })` for every GS
 - `next.config.ts`: `output: "standalone"`.
 - Multi-stage `Dockerfile` (deps → builder incl. `prisma generate` + `next build` → runner on `node:24-alpine`, non-root user, copies `.next/standalone` + `.next/static` + `public/` + Prisma client artifacts).
 - `docker-entrypoint.sh` runs `npx prisma migrate deploy` then `node server.js` on every container start (safe for Coolify's stop-old/start-new single-instance deploy model; revisit only if moving to zero-downtime multi-instance deploys).
-- `docker-compose.yml` as the Coolify reference: `app` service + `db` (postgres:18-alpine) service, named volumes `db_data` (Postgres data dir) and `uploads_data` (mounted at `/app/public/uploads`) — **both must be configured as persistent storage in Coolify**, or a redeploy wipes the database and every uploaded image.
+- `docker-compose.yaml` as the Coolify reference: `app` service only — Postgres runs as a separate Coolify resource, referenced via `DATABASE_URL`. The `uploads_data` volume (mounted at `/app/public/uploads`) **must be configured as persistent storage in Coolify**, or a redeploy wipes every uploaded image.
 - Env vars: `DATABASE_URL`, `SESSION_SECRET`, `ADMIN_EMAIL`/`ADMIN_PASSWORD` (seed-only), `NEXT_PUBLIC_SITE_URL`, `UPLOADS_DIR`, `PORT`/`HOSTNAME`, optional `SMTP_*`/`NOTIFY_EMAIL_TO`.
 - Optional SMTP notification (`lib/mail.ts`, `nodemailer`) fires after the `Submission` row is already committed — a mail failure never loses a lead; the admin Submissions view is the source of truth regardless.
 
@@ -150,7 +150,7 @@ Use `@gsap/react`'s `useGSAP(() => {...}, { scope: containerRef })` for every GS
 4. **Admin CRUD** — `DataTable`, `ImageUploadField`, then Workshops → Facilitators → Gallery → Partners → Settings → Submissions. Verify: full create/edit/delete cycle per entity, uploads land in `public/uploads/`.
 5. **Public pages** — shared components (Header, Footer, Button, EyebrowHeading, CTASection, Countdown) then all 8 pages wired to Prisma with seed data; wire both forms to `Submission`. Verify: every nav link resolves, forms create rows visible in `/admin/submissions`, countdown ticks correctly.
 6. **Animation polish** — Motion first (buttons/nav/stagger), then GSAP/ScrollTrigger (hero parallax, scroll reveals). Verify: no duplicate-ScrollTrigger warnings across navigation, smooth on mobile viewport.
-7. **Dockerize** — `Dockerfile`, `docker-entrypoint.sh`, `docker-compose.yml`, `.env.example`; `docker compose up --build` locally against a fresh volume. Verify: site fully functional containerized, uploads persist across `docker compose restart`.
+7. **Dockerize** — `Dockerfile`, `docker-entrypoint.sh`, `docker-compose.yaml`, `.env.example`; `docker compose up --build` locally against a fresh volume. Verify: site fully functional containerized, uploads persist across `docker compose restart`.
 8. **Deploy to Coolify** — push to watched git remote, configure app + Postgres in Coolify, set env vars as secrets, attach persistent volumes, point domain. Verify: HTTPS prod URL loads, admin login works, a real submission appears in `/admin/submissions`, a redeploy doesn't lose data/uploads.
 
 Each milestone is a natural commit-sized checkpoint — verify one before starting the next.
