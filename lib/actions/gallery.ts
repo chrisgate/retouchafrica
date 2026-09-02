@@ -5,30 +5,43 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
 import { saveUpload, deleteUpload } from "@/lib/uploads";
-import { galleryImageSchema } from "@/lib/validation/schemas";
+import { galleryImageSchema, formatZodError } from "@/lib/validation/schemas";
+
+export type GalleryImageFormState = { error?: string } | undefined;
 
 function revalidateGalleryPaths() {
   revalidatePath("/");
   revalidatePath("/gallery");
 }
 
-export async function createGalleryImageAction(formData: FormData) {
+export async function createGalleryImageAction(
+  _prevState: GalleryImageFormState,
+  formData: FormData,
+): Promise<GalleryImageFormState> {
   await requireAdmin();
 
-  const parsed = galleryImageSchema.parse(Object.fromEntries(formData.entries()));
+  const parsed = galleryImageSchema.safeParse(Object.fromEntries(formData.entries()));
+  if (!parsed.success) return { error: formatZodError(parsed.error) };
+
   const file = formData.get("image");
   if (!(file instanceof File) || file.size === 0) {
-    throw new Error("An image file is required.");
+    return { error: "An image file is required." };
   }
-  const imageUrl = await saveUpload(file, "gallery");
+
+  let imageUrl: string;
+  try {
+    imageUrl = await saveUpload(file, "gallery");
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "Failed to upload image." };
+  }
 
   await prisma.galleryImage.create({
     data: {
       imageUrl,
-      caption: parsed.caption || null,
-      category: parsed.category || null,
-      order: parsed.order,
-      isPublished: parsed.isPublished,
+      caption: parsed.data.caption || null,
+      category: parsed.data.category || null,
+      order: parsed.data.order,
+      isPublished: parsed.data.isPublished,
     },
   });
 
@@ -36,20 +49,33 @@ export async function createGalleryImageAction(formData: FormData) {
   redirect("/admin/gallery");
 }
 
-export async function updateGalleryImageAction(id: string, formData: FormData) {
+export async function updateGalleryImageAction(
+  id: string,
+  _prevState: GalleryImageFormState,
+  formData: FormData,
+): Promise<GalleryImageFormState> {
   await requireAdmin();
 
-  const parsed = galleryImageSchema.parse(Object.fromEntries(formData.entries()));
+  const parsed = galleryImageSchema.safeParse(Object.fromEntries(formData.entries()));
+  if (!parsed.success) return { error: formatZodError(parsed.error) };
+
   const file = formData.get("image");
-  const imageUrl = file instanceof File && file.size > 0 ? await saveUpload(file, "gallery") : undefined;
+  let imageUrl: string | undefined;
+  if (file instanceof File && file.size > 0) {
+    try {
+      imageUrl = await saveUpload(file, "gallery");
+    } catch (error) {
+      return { error: error instanceof Error ? error.message : "Failed to upload image." };
+    }
+  }
 
   await prisma.galleryImage.update({
     where: { id },
     data: {
-      caption: parsed.caption || null,
-      category: parsed.category || null,
-      order: parsed.order,
-      isPublished: parsed.isPublished,
+      caption: parsed.data.caption || null,
+      category: parsed.data.category || null,
+      order: parsed.data.order,
+      isPublished: parsed.data.isPublished,
       ...(imageUrl ? { imageUrl } : {}),
     },
   });

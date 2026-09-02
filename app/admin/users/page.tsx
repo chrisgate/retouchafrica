@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { requireSuperAdmin } from "@/lib/auth";
-import { createAdminUserAction, deleteAdminUserAction } from "@/lib/actions/admins";
-import { Field, Checkbox } from "@/components/admin/forms/fields";
+import { deleteAdminUserAction } from "@/lib/actions/admins";
+import { AdminUserForm } from "@/components/admin/forms/AdminUserForm";
 
 export default async function AdminUsersPage() {
   const { session } = await requireSuperAdmin();
@@ -53,17 +53,7 @@ export default async function AdminUsersPage() {
 
       <div className="mt-10 max-w-md">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-gold">Add Admin User</h2>
-        <form action={createAdminUserAction} className="mt-4 flex flex-col gap-4">
-          <Field label="Email" name="email" type="email" required />
-          <Field label="Password (min. 8 characters)" name="password" type="password" required />
-          <Checkbox label="Grant super admin (can manage other admins)" name="isSuperAdmin" />
-          <button
-            type="submit"
-            className="mt-2 w-fit bg-ink px-6 py-3 text-xs font-semibold uppercase tracking-[0.15em] text-paper hover:bg-ink/80"
-          >
-            Add Admin
-          </button>
-        </form>
+        <AdminUserForm />
       </div>
     </div>
   );

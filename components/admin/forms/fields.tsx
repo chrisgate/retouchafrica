@@ -1,3 +1,8 @@
+export function FormError({ message }: { message?: string }) {
+  if (!message) return null;
+  return <p className="border border-red-600/30 bg-red-600/5 px-3 py-2 text-sm text-red-600">{message}</p>;
+}
+
 export function Field({
   label,
   name,

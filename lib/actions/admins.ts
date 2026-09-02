@@ -2,19 +2,34 @@
 
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireSuperAdmin } from "@/lib/auth";
-import { createAdminUserSchema } from "@/lib/validation/schemas";
+import { createAdminUserSchema, formatZodError } from "@/lib/validation/schemas";
 
-export async function createAdminUserAction(formData: FormData) {
+export type AdminUserFormState = { error?: string } | undefined;
+
+export async function createAdminUserAction(
+  _prevState: AdminUserFormState,
+  formData: FormData,
+): Promise<AdminUserFormState> {
   await requireSuperAdmin();
 
-  const parsed = createAdminUserSchema.parse(Object.fromEntries(formData.entries()));
-  const passwordHash = await bcrypt.hash(parsed.password, 10);
+  const parsed = createAdminUserSchema.safeParse(Object.fromEntries(formData.entries()));
+  if (!parsed.success) return { error: formatZodError(parsed.error) };
 
-  await prisma.adminUser.create({
-    data: { email: parsed.email, passwordHash, isSuperAdmin: parsed.isSuperAdmin },
-  });
+  const passwordHash = await bcrypt.hash(parsed.data.password, 10);
+
+  try {
+    await prisma.adminUser.create({
+      data: { email: parsed.data.email, passwordHash, isSuperAdmin: parsed.data.isSuperAdmin },
+    });
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+      return { error: "An admin user with this email already exists." };
+    }
+    throw error;
+  }
 
   revalidatePath("/admin/users");
 }

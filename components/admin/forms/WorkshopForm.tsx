@@ -1,6 +1,10 @@
+"use client";
+
+import { useActionState } from "react";
 import type { Workshop } from "@prisma/client";
+import type { WorkshopFormState } from "@/lib/actions/workshops";
 import { ImageUploadField } from "@/components/admin/ImageUploadField";
-import { Field, TextArea, Checkbox } from "@/components/admin/forms/fields";
+import { Field, TextArea, Checkbox, FormError } from "@/components/admin/forms/fields";
 
 function toLocalInputValue(date?: Date | null) {
   if (!date) return "";
@@ -13,11 +17,15 @@ export function WorkshopForm({
   action,
   workshop,
 }: {
-  action: (formData: FormData) => void | Promise<void>;
+  action: (prevState: WorkshopFormState, formData: FormData) => WorkshopFormState | Promise<WorkshopFormState>;
   workshop?: Workshop;
 }) {
+  const [state, formAction, pending] = useActionState(action, undefined);
+
   return (
-    <form action={action} className="flex max-w-2xl flex-col gap-5">
+    <form action={formAction} className="flex max-w-2xl flex-col gap-5">
+      <FormError message={state?.error} />
+
       {workshop?.galleryImages.map((url) => (
         <input key={url} type="hidden" name="existingGalleryImages" value={url} />
       ))}
@@ -63,11 +71,11 @@ export function WorkshopForm({
 
       <button
         type="submit"
-        className="mt-2 w-fit bg-ink px-6 py-3 text-xs font-semibold uppercase tracking-[0.15em] text-paper hover:bg-ink/80"
+        disabled={pending}
+        className="mt-2 w-fit bg-ink px-6 py-3 text-xs font-semibold uppercase tracking-[0.15em] text-paper hover:bg-ink/80 disabled:opacity-50"
       >
-        Save Workshop
+        {pending ? "Saving…" : "Save Workshop"}
       </button>
     </form>
   );
 }
-

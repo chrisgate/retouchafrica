@@ -1,5 +1,13 @@
 import { z } from "zod";
 
+/** First issue's message, prefixed with its field path when useful — good enough for a one-line form banner. */
+export function formatZodError(error: z.ZodError): string {
+  const issue = error.issues[0];
+  if (!issue) return "Invalid input.";
+  const field = issue.path.join(".");
+  return field ? `${field}: ${issue.message}` : issue.message;
+}
+
 export const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(1),
@@ -13,7 +21,7 @@ export const createAdminUserSchema = z.object({
 
 export const socialLinkSchema = z.object({
   platform: z.enum(["INSTAGRAM", "FACEBOOK", "TIKTOK", "YOUTUBE", "TWITTER", "LINKEDIN", "OTHER"]),
-  url: z.string().url(),
+  url: z.string().url("Enter a valid URL starting with https://"),
   order: z.coerce.number().int().default(0),
 });
 
@@ -32,7 +40,7 @@ export const workshopSchema = z.object({
   seatsLabel: z.string().default("LIMITED SEATS"),
   startDate: z.coerce.date(),
   endDate: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.date().optional().nullable()),
-  registerUrl: z.string().url().optional().or(z.literal("")),
+  registerUrl: z.string().url("Enter a valid URL starting with https://").optional().or(z.literal("")),
   isFeatured: z.coerce.boolean().default(false),
   isPublished: z.coerce.boolean().default(true),
 });
@@ -58,7 +66,7 @@ export const galleryImageSchema = z.object({
 
 export const partnerSchema = z.object({
   name: z.string().min(1),
-  websiteUrl: z.string().url().optional().or(z.literal("")),
+  websiteUrl: z.string().url("Enter a valid URL starting with https://").optional().or(z.literal("")),
   order: z.coerce.number().int().default(0),
   isPublished: z.coerce.boolean().default(true),
 });

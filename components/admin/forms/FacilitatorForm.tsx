@@ -1,6 +1,10 @@
+"use client";
+
+import { useActionState } from "react";
 import type { Facilitator, SocialLink } from "@prisma/client";
+import type { FacilitatorFormState } from "@/lib/actions/facilitators";
 import { ImageUploadField } from "@/components/admin/ImageUploadField";
-import { Field, TextArea, Checkbox } from "@/components/admin/forms/fields";
+import { Field, TextArea, Checkbox, FormError } from "@/components/admin/forms/fields";
 
 const PLATFORMS = ["INSTAGRAM", "FACEBOOK", "TIKTOK", "YOUTUBE", "TWITTER", "LINKEDIN", "OTHER"];
 
@@ -8,14 +12,17 @@ export function FacilitatorForm({
   action,
   facilitator,
 }: {
-  action: (formData: FormData) => void | Promise<void>;
+  action: (prevState: FacilitatorFormState, formData: FormData) => FacilitatorFormState | Promise<FacilitatorFormState>;
   facilitator?: Facilitator & { socialLinks: SocialLink[] };
 }) {
+  const [state, formAction, pending] = useActionState(action, undefined);
   const existing = facilitator?.socialLinks ?? [];
   const socialRows = Array.from({ length: 4 }, (_, i) => existing[i] ?? { platform: "INSTAGRAM", url: "" });
 
   return (
-    <form action={action} className="flex max-w-2xl flex-col gap-5">
+    <form action={formAction} className="flex max-w-2xl flex-col gap-5">
+      <FormError message={state?.error} />
+
       <Field label="Slug (lowercase-with-hyphens)" name="slug" defaultValue={facilitator?.slug} required />
       <Field label="Name" name="name" defaultValue={facilitator?.name} required />
       <Field label="Role" name="role" defaultValue={facilitator?.role} required />
@@ -56,9 +63,10 @@ export function FacilitatorForm({
 
       <button
         type="submit"
-        className="mt-2 w-fit bg-ink px-6 py-3 text-xs font-semibold uppercase tracking-[0.15em] text-paper hover:bg-ink/80"
+        disabled={pending}
+        className="mt-2 w-fit bg-ink px-6 py-3 text-xs font-semibold uppercase tracking-[0.15em] text-paper hover:bg-ink/80 disabled:opacity-50"
       >
-        Save Facilitator
+        {pending ? "Saving…" : "Save Facilitator"}
       </button>
     </form>
   );

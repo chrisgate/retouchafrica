@@ -3,21 +3,28 @@
 import { revalidatePath, updateTag } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
-import { siteSettingsSchema } from "@/lib/validation/schemas";
+import { siteSettingsSchema, formatZodError } from "@/lib/validation/schemas";
 
-export async function updateSiteSettingsAction(formData: FormData) {
+export type SiteSettingsFormState = { error?: string; success?: boolean } | undefined;
+
+export async function updateSiteSettingsAction(
+  _prevState: SiteSettingsFormState,
+  formData: FormData,
+): Promise<SiteSettingsFormState> {
   await requireAdmin();
 
-  const raw = Object.fromEntries(formData.entries());
-  const parsed = siteSettingsSchema.parse(raw);
+  const parsed = siteSettingsSchema.safeParse(Object.fromEntries(formData.entries()));
+  if (!parsed.success) return { error: formatZodError(parsed.error) };
 
   await prisma.siteSettings.upsert({
     where: { id: 1 },
-    update: parsed,
-    create: { id: 1, ...parsed },
+    update: parsed.data,
+    create: { id: 1, ...parsed.data },
   });
 
   updateTag("site-settings");
   revalidatePath("/");
   revalidatePath("/about");
+
+  return { success: true };
 }
