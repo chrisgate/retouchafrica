@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import type { Facilitator, SocialLink } from "@prisma/client";
 import type { FacilitatorFormState } from "@/lib/actions/facilitators";
 import { ImageUploadField } from "@/components/admin/ImageUploadField";
-import { Field, TextArea, Checkbox, FormError } from "@/components/admin/forms/fields";
+import { Field, TextArea, Checkbox, FormError, SlugField } from "@/components/admin/forms/fields";
 
 const PLATFORMS = ["INSTAGRAM", "FACEBOOK", "TIKTOK", "YOUTUBE", "TWITTER", "LINKEDIN", "OTHER"];
 
@@ -23,7 +23,7 @@ export function FacilitatorForm({
     <form action={formAction} className="flex max-w-2xl flex-col gap-5">
       <FormError message={state?.error} />
 
-      <Field label="Slug (lowercase-with-hyphens)" name="slug" defaultValue={facilitator?.slug} required />
+      <SlugField label="Slug" name="slug" defaultValue={facilitator?.slug} required />
       <Field label="Name" name="name" defaultValue={facilitator?.name} required />
       <Field label="Role" name="role" defaultValue={facilitator?.role} required />
       <TextArea label="Bio" name="bio" defaultValue={facilitator?.bio} required rows={4} />

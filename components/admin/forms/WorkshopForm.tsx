@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import type { Workshop } from "@prisma/client";
 import type { WorkshopFormState } from "@/lib/actions/workshops";
 import { ImageUploadField } from "@/components/admin/ImageUploadField";
-import { Field, TextArea, Checkbox, FormError } from "@/components/admin/forms/fields";
+import { Field, TextArea, Checkbox, FormError, SlugField } from "@/components/admin/forms/fields";
 
 function toLocalInputValue(date?: Date | null) {
   if (!date) return "";
@@ -30,7 +30,7 @@ export function WorkshopForm({
         <input key={url} type="hidden" name="existingGalleryImages" value={url} />
       ))}
 
-      <Field label="Slug (lowercase-with-hyphens)" name="slug" defaultValue={workshop?.slug} required />
+      <SlugField label="Slug" name="slug" defaultValue={workshop?.slug} required />
       <Field label="Title" name="title" defaultValue={workshop?.title} required />
       <Field label="Eyebrow" name="eyebrow" defaultValue={workshop?.eyebrow ?? "UPCOMING WORKSHOP"} />
       <TextArea label="Summary" name="summary" defaultValue={workshop?.summary} required rows={2} />
