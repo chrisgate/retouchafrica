@@ -31,7 +31,7 @@ export const workshopSchema = z.object({
   venueLabel: z.string().optional().or(z.literal("")),
   seatsLabel: z.string().default("LIMITED SEATS"),
   startDate: z.coerce.date(),
-  endDate: z.coerce.date().optional().nullable(),
+  endDate: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.date().optional().nullable()),
   registerUrl: z.string().url().optional().or(z.literal("")),
   isFeatured: z.coerce.boolean().default(false),
   isPublished: z.coerce.boolean().default(true),
