@@ -21,7 +21,7 @@ export async function PartnersStrip() {
 
         <div className="mt-10 flex flex-wrap items-center justify-center gap-x-12 gap-y-6">
           {partners.map((partner) => (
-            <div key={partner.id} className="relative h-8 w-28 opacity-70 grayscale hover:opacity-100 hover:grayscale-0">
+            <div key={partner.id} className="relative h-14 w-40 opacity-70 grayscale hover:opacity-100 hover:grayscale-0">
               <Image src={partner.logoUrl} alt={partner.name} fill className="object-contain" />
             </div>
           ))}
