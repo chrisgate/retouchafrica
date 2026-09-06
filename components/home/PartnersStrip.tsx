@@ -19,13 +19,16 @@ export async function PartnersStrip() {
           <EyebrowHeading>Partners &amp; Sponsors</EyebrowHeading>
         </FadeIn>
 
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-x-12 gap-y-6">
+        <div className="mt-10 flex flex-wrap items-start justify-center gap-x-12 gap-y-8">
           {partners.map((partner) => (
-            <div key={partner.id} className="relative h-14 w-40 opacity-70 grayscale hover:opacity-100 hover:grayscale-0">
-              <Image src={partner.logoUrl} alt={partner.name} fill className="object-contain" />
+            <div key={partner.id} className="flex flex-col items-center gap-2 transition-transform hover:scale-105">
+              <div className="relative h-14 w-40">
+                <Image src={partner.logoUrl} alt={partner.name} fill className="object-contain" />
+              </div>
+              <p className="text-xs font-medium uppercase tracking-wide text-ink/60">{partner.name}</p>
             </div>
           ))}
-          <Button href="/partners" variant="outline">
+          <Button href="/partners" variant="outline" className="self-center">
             Become a Partner
           </Button>
         </div>

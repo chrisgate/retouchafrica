@@ -26,10 +26,13 @@ export default async function PartnersPage() {
           <SectionHeading className="mt-4">Backed By Industry Leaders</SectionHeading>
         </FadeIn>
 
-        <div className="mt-16 flex flex-wrap items-center justify-center gap-x-14 gap-y-10">
+        <div className="mt-16 flex flex-wrap items-start justify-center gap-x-14 gap-y-10">
           {partners.map((partner) => (
-            <div key={partner.id} className="relative h-16 w-44 opacity-80">
-              <Image src={partner.logoUrl} alt={partner.name} fill className="object-contain" />
+            <div key={partner.id} className="flex flex-col items-center gap-3 transition-transform hover:scale-105">
+              <div className="relative h-16 w-44">
+                <Image src={partner.logoUrl} alt={partner.name} fill className="object-contain" />
+              </div>
+              <p className="text-sm font-medium text-ink/70">{partner.name}</p>
             </div>
           ))}
         </div>
