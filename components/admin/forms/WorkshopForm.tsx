@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import type { Workshop } from "@prisma/client";
 import type { WorkshopFormState } from "@/lib/actions/workshops";
 import { ImageUploadField } from "@/components/admin/ImageUploadField";
+import { GalleryImagesField } from "@/components/admin/GalleryImagesField";
 import { Field, TextArea, Checkbox, FormError, SlugField } from "@/components/admin/forms/fields";
 
 function toLocalInputValue(date?: Date | null) {
@@ -25,10 +26,6 @@ export function WorkshopForm({
   return (
     <form action={formAction} className="flex max-w-2xl flex-col gap-5">
       <FormError message={state?.error} />
-
-      {workshop?.galleryImages.map((url) => (
-        <input key={url} type="hidden" name="existingGalleryImages" value={url} />
-      ))}
 
       <SlugField label="Slug" name="slug" defaultValue={workshop?.slug} required />
       <Field label="Title" name="title" defaultValue={workshop?.title} required />
@@ -62,7 +59,7 @@ export function WorkshopForm({
       <Field label="External register URL (optional)" name="registerUrl" defaultValue={workshop?.registerUrl ?? ""} />
 
       <ImageUploadField name="heroImage" label="Hero image" currentUrl={workshop?.heroImageUrl} />
-      <ImageUploadField name="galleryImages" label="Collage photos (add more)" multiple />
+      <GalleryImagesField images={workshop?.galleryImages ?? []} />
 
       <div className="flex gap-6">
         <Checkbox label="Featured on homepage" name="isFeatured" defaultChecked={workshop?.isFeatured ?? false} />

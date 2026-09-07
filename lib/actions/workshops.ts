@@ -75,6 +75,8 @@ export async function updateWorkshopAction(
   const parsed = workshopSchema.safeParse(Object.fromEntries(formData.entries()));
   if (!parsed.success) return { error: formatZodError(parsed.error) };
 
+  const previous = await prisma.workshop.findUnique({ where: { id }, select: { heroImageUrl: true, galleryImages: true } });
+
   let galleryImages: string[];
   let heroImageUrl: string | undefined;
   try {
@@ -100,6 +102,10 @@ export async function updateWorkshopAction(
     if (isUniqueSlugError(error)) return { error: "A workshop with this slug already exists." };
     throw error;
   }
+
+  const removedGalleryImages = (previous?.galleryImages ?? []).filter((url) => !galleryImages.includes(url));
+  await Promise.all(removedGalleryImages.map((url) => deleteUpload(url)));
+  if (heroImageUrl && previous?.heroImageUrl) await deleteUpload(previous.heroImageUrl);
 
   revalidateWorkshopPaths(parsed.data.slug);
   redirect("/admin/workshops");
