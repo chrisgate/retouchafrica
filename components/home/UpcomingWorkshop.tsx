@@ -4,6 +4,7 @@ import { SectionHeading } from "@/components/shared/SectionHeading";
 import { Button } from "@/components/shared/Button";
 import { Countdown } from "@/components/shared/Countdown";
 import { FadeIn } from "@/components/motion/FadeIn";
+import { fillCollageImages } from "@/lib/collage";
 import type { Workshop } from "@prisma/client";
 
 const INFO_ICONS = {
@@ -29,6 +30,8 @@ const INFO_ICONS = {
 
 export function UpcomingWorkshop({ workshop }: { workshop: Workshop | null }) {
   if (!workshop) return null;
+
+  const collage = fillCollageImages(workshop.galleryImages);
 
   return (
     <section className="bg-ink py-24">
@@ -63,16 +66,11 @@ export function UpcomingWorkshop({ workshop }: { workshop: Workshop | null }) {
 
         <FadeIn delay={0.15} className="flex flex-col gap-8">
           <div className="grid grid-cols-3 gap-3">
-            {(workshop.galleryImages.length > 0
-              ? workshop.galleryImages
-              : [null, null, null]
-            )
-              .slice(0, 3)
-              .map((src, i) => (
-                <div key={i} className="relative aspect-[3/4] overflow-hidden bg-ink-soft">
-                  {src && <Image src={src} alt="" fill className="object-cover" />}
-                </div>
-              ))}
+            {(collage.length > 0 ? collage : [null, null, null]).map((src, i) => (
+              <div key={i} className="relative aspect-[3/4] overflow-hidden bg-ink-soft">
+                {src && <Image src={src} alt="" fill className="object-cover" />}
+              </div>
+            ))}
           </div>
           <Countdown target={workshop.startDate.toISOString()} />
         </FadeIn>

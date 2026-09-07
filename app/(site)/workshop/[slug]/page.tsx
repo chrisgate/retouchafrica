@@ -8,6 +8,7 @@ import { Countdown } from "@/components/shared/Countdown";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { prisma } from "@/lib/prisma";
 import { getNowMs } from "@/lib/time";
+import { fillCollageImages } from "@/lib/collage";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +28,7 @@ export default async function WorkshopDetailPage({ params }: { params: Promise<{
   if (!workshop || !workshop.isPublished) notFound();
 
   const isUpcoming = workshop.startDate.getTime() >= getNowMs();
+  const collage = fillCollageImages(workshop.galleryImages);
 
   return (
     <section className="bg-ink py-24">
@@ -62,9 +64,9 @@ export default async function WorkshopDetailPage({ params }: { params: Promise<{
         </FadeIn>
 
         <FadeIn delay={0.15} className="flex flex-col gap-8">
-          {workshop.galleryImages.length > 0 && (
+          {collage.length > 0 && (
             <div className="grid grid-cols-3 gap-3">
-              {workshop.galleryImages.slice(0, 3).map((src, i) => (
+              {collage.map((src, i) => (
                 <div key={i} className="relative aspect-[3/4] overflow-hidden bg-ink-soft">
                   <Image src={src} alt="" fill className="object-cover" />
                 </div>
