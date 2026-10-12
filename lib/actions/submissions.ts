@@ -12,6 +12,7 @@ import {
   hasTooManyLinks,
   isHoneypotTripped,
 } from "@/lib/spam-guard";
+import { TURNSTILE_RESPONSE_FIELD, verifyTurnstile } from "@/lib/turnstile";
 import {
   contactFormSchema,
   joinCommunityFormSchema,
@@ -42,6 +43,10 @@ async function submit(
   }
   if (token !== "ok") {
     return { error: "This form has expired. Please refresh the page and try again." };
+  }
+
+  if (!(await verifyTurnstile(formData.get(TURNSTILE_RESPONSE_FIELD)))) {
+    return { error: "We couldn't verify that you're human. Please try again." };
   }
 
   const parsed = schema.safeParse(Object.fromEntries(formData.entries()));
