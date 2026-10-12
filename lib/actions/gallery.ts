@@ -12,42 +12,11 @@ export type GalleryImageFormState = { error?: string } | undefined;
 function revalidateGalleryPaths() {
   revalidatePath("/");
   revalidatePath("/gallery");
+  revalidatePath("/admin/gallery");
 }
 
-export async function createGalleryImageAction(
-  _prevState: GalleryImageFormState,
-  formData: FormData,
-): Promise<GalleryImageFormState> {
-  await requireAdmin();
-
-  const parsed = galleryImageSchema.safeParse(Object.fromEntries(formData.entries()));
-  if (!parsed.success) return { error: formatZodError(parsed.error) };
-
-  const file = formData.get("image");
-  if (!(file instanceof File) || file.size === 0) {
-    return { error: "An image file is required." };
-  }
-
-  let imageUrl: string;
-  try {
-    imageUrl = await saveUpload(file, "gallery");
-  } catch (error) {
-    return { error: error instanceof Error ? error.message : "Failed to upload image." };
-  }
-
-  await prisma.galleryImage.create({
-    data: {
-      imageUrl,
-      caption: parsed.data.caption || null,
-      category: parsed.data.category || null,
-      order: parsed.data.order,
-      isPublished: parsed.data.isPublished,
-    },
-  });
-
-  revalidateGalleryPaths();
-  redirect("/admin/gallery");
-}
+// New photos are added through the batch uploader (POST /api/gallery/upload);
+// this file only handles editing and removing existing ones.
 
 export async function updateGalleryImageAction(
   id: string,
@@ -89,6 +58,17 @@ export async function deleteGalleryImageAction(id: string) {
 
   const image = await prisma.galleryImage.delete({ where: { id } });
   await deleteUpload(image.imageUrl);
+
+  revalidateGalleryPaths();
+}
+
+export async function deleteGalleryImagesAction(ids: string[]) {
+  await requireAdmin();
+  if (ids.length === 0) return;
+
+  const images = await prisma.galleryImage.findMany({ where: { id: { in: ids } } });
+  await prisma.galleryImage.deleteMany({ where: { id: { in: images.map((image) => image.id) } } });
+  await Promise.all(images.map((image) => deleteUpload(image.imageUrl)));
 
   revalidateGalleryPaths();
 }

@@ -90,7 +90,7 @@ components/
   shared/ (EyebrowHeading, SectionHeading, Button, CTASection, Countdown, SocialIcons)
   home/ (Hero, OurStory, UpcomingWorkshop, FacilitatorsPreview, GalleryPreview, PartnersStrip)
   facilitators/FacilitatorCard.tsx
-  gallery/GalleryGrid.tsx
+  gallery/ (GalleryMasonry, Lightbox)
   forms/ (ContactForm, JoinCommunityForm)
   admin/ (AdminSidebar, DataTable, ImageUploadField, forms/*)
   motion/ (FadeIn, StaggerChildren, GsapScrollReveal)

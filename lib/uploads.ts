@@ -50,6 +50,36 @@ export async function saveUpload(file: File, folder: UploadFolder): Promise<stri
   return `/uploads/${folder}/${filename}`;
 }
 
+const sizeCache = new Map<string, { width: number; height: number } | null>();
+
+/**
+ * Reads the pixel dimensions of a previously uploaded image (header only, no
+ * full decode) so galleries can reserve the right aspect ratio before the
+ * image loads. Upload filenames are random UUIDs and never overwritten, so
+ * results are cached for the life of the process. Returns null when the file
+ * is missing or unreadable — callers should fall back to a default ratio.
+ */
+export async function getImageSize(publicPath: string): Promise<{ width: number; height: number } | null> {
+  if (sizeCache.has(publicPath)) return sizeCache.get(publicPath) ?? null;
+  if (!publicPath.startsWith("/uploads/")) return null;
+
+  const absolute = path.resolve(/* turbopackIgnore: true */ UPLOADS_DIR, publicPath.replace(/^\/uploads\//, ""));
+  const root = path.resolve(/* turbopackIgnore: true */ UPLOADS_DIR);
+  if (!absolute.startsWith(root + path.sep)) return null;
+
+  try {
+    const { width, height, orientation } = await sharp(absolute).metadata();
+    if (!width || !height) return null;
+    // EXIF orientations 5-8 are rotated 90°, so the displayed width/height swap.
+    const size = orientation && orientation >= 5 ? { width: height, height: width } : { width, height };
+    sizeCache.set(publicPath, size);
+    return size;
+  } catch {
+    // Not cached: the file may simply not have been written/synced yet.
+    return null;
+  }
+}
+
 /**
  * Deletes a previously uploaded image given its public URL path
  * (e.g. "/uploads/gallery/abc123.jpg"). No-ops silently if the file is missing
