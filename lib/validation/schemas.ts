@@ -94,10 +94,10 @@ export const siteSettingsSchema = z.object({
 });
 
 const contactBase = {
-  name: z.string().min(1, "Name is required."),
-  email: z.string().email("Enter a valid email address."),
-  phone: z.string().optional().or(z.literal("")),
-  message: z.string().optional().or(z.literal("")),
+  name: z.string().trim().min(1, "Name is required.").max(120),
+  email: z.string().trim().email("Enter a valid email address.").max(254),
+  phone: z.string().trim().max(40).optional().or(z.literal("")),
+  message: z.string().trim().max(5000).optional().or(z.literal("")),
 };
 
 export const contactFormSchema = z.object(contactBase);
