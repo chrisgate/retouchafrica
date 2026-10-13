@@ -3,9 +3,16 @@
 import { useActionState } from "react";
 import { updateSiteSettingsAction } from "@/lib/actions/settings";
 import type { SiteSettings } from "@/lib/site-settings";
+import { HeroImageUploader } from "@/components/admin/HeroImageUploader";
 import { Field, TextArea, FormError } from "@/components/admin/forms/fields";
 
-export function SiteSettingsForm({ settings: s }: { settings: SiteSettings }) {
+export function SiteSettingsForm({
+  settings: s,
+  heroImages,
+}: {
+  settings: SiteSettings;
+  heroImages: { id: string; imageUrl: string }[];
+}) {
   const [state, formAction, pending] = useActionState(updateSiteSettingsAction, undefined);
 
   return (
@@ -15,6 +22,7 @@ export function SiteSettingsForm({ settings: s }: { settings: SiteSettings }) {
 
       <section className="flex flex-col gap-4">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-gold">Hero</h2>
+        <HeroImageUploader images={heroImages} />
         <Field label="Eyebrow" name="heroEyebrow" defaultValue={s.heroEyebrow} />
         <Field label="Title" name="heroTitle" defaultValue={s.heroTitle} />
         <Field label="Tagline" name="heroTagline" defaultValue={s.heroTagline} />

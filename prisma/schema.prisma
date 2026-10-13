@@ -134,6 +134,14 @@ model GalleryImage {
   @@index([isPublished])
 }
 
+/// Rotating background images for the home-page hero.
+model HeroImage {
+  id        String   @id @default(cuid())
+  imageUrl  String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
 model Partner {
   id          String   @id @default(cuid())
   name        String

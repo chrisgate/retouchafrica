@@ -11,8 +11,9 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [settings, featuredWorkshop, socialLinks] = await Promise.all([
+  const [settings, heroImages, featuredWorkshop, socialLinks] = await Promise.all([
     getSiteSettings(),
+    prisma.heroImage.findMany({ orderBy: [{ order: "asc" }, { createdAt: "asc" }], select: { imageUrl: true } }),
     prisma.workshop.findFirst({
       where: { isFeatured: true, isPublished: true },
       orderBy: { startDate: "asc" },
@@ -22,7 +23,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <Hero settings={settings} />
+      <Hero settings={settings} images={heroImages.map((image) => image.imageUrl)} />
       <OurStory settings={settings} />
       <UpcomingWorkshop workshop={featuredWorkshop} />
       <FacilitatorsPreview />
