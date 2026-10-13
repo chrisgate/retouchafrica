@@ -5,12 +5,12 @@ import { SectionHeading } from "@/components/shared/SectionHeading";
 import { Button } from "@/components/shared/Button";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { GsapScrollReveal } from "@/components/motion/GsapScrollReveal";
-import { getPublishedGalleryItems } from "@/lib/gallery";
+import { getRandomGalleryItems } from "@/lib/gallery";
 
 const PREVIEW_COUNT = 6;
 
 export async function GalleryPreview() {
-  const items = await getPublishedGalleryItems(PREVIEW_COUNT);
+  const items = await getRandomGalleryItems(PREVIEW_COUNT);
 
   if (items.length === 0) return null;
 
@@ -27,7 +27,7 @@ export async function GalleryPreview() {
           </div>
         </FadeIn>
 
-        {/* A tidy, uniform contact-sheet: every photo links through to the full gallery. */}
+        {/* A tidy, uniform contact-sheet of 6 random photos (new pick every load); each links to the full gallery. */}
         <GsapScrollReveal className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
           {items.map((item) => (
             <Link
