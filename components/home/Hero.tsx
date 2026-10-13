@@ -33,7 +33,8 @@ export function Hero({ settings, images }: { settings: SiteSettings; images: str
           <p className="mt-6 font-display text-xl leading-snug text-paper/90 sm:text-2xl">{settings.heroTagline}</p>
           <p className="mt-4 text-sm leading-relaxed text-paper/70">{settings.heroBody}</p>
 
-          <div className="mt-8 flex flex-wrap gap-4">
+          {/* w-max lets the pair overflow the narrow text column so they stay side by side, as in the design. */}
+          <div className="mt-8 flex flex-wrap gap-4 sm:w-max sm:flex-nowrap">
             <Button href="/workshop" variant="solid">
               Upcoming Workshop
             </Button>
