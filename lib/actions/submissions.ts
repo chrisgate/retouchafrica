@@ -109,3 +109,9 @@ export async function markSubmissionStatusAction(id: string, status: "NEW" | "RE
   await prisma.submission.update({ where: { id }, data: { status } });
   revalidatePath("/admin/submissions");
 }
+
+export async function deleteSubmissionAction(id: string) {
+  await requireAdmin();
+  await prisma.submission.delete({ where: { id } });
+  revalidatePath("/admin/submissions");
+}
