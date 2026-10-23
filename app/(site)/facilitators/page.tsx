@@ -9,7 +9,10 @@ import { getPublishedFacilitators } from "@/lib/queries";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Facilitators — Retouch Africa",
+  title: "Facilitators",
+  description:
+    "Meet the professional retouchers and photographers who teach and mentor at Retouch Africa workshops.",
+  alternates: { canonical: "/facilitators" },
 };
 
 export default async function FacilitatorsPage() {
@@ -20,7 +23,7 @@ export default async function FacilitatorsPage() {
       <div className="mx-auto max-w-7xl px-6">
         <FadeIn className="text-center">
           <EyebrowHeading>Facilitators</EyebrowHeading>
-          <SectionHeading className="mt-4">Meet the Experts</SectionHeading>
+          <SectionHeading as="h1" className="mt-4">Meet the Experts</SectionHeading>
         </FadeIn>
 
         <StaggerChildren className="mt-16 grid items-stretch gap-10 sm:grid-cols-2 lg:grid-cols-3">

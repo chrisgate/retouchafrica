@@ -10,7 +10,10 @@ import { getSocialLinks } from "@/lib/queries";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "About — Retouch Africa",
+  title: "About",
+  description:
+    "Learn the story, mission and vision behind Retouch Africa, a community built to educate and connect retouchers and digital artists across Africa.",
+  alternates: { canonical: "/about" },
 };
 
 export default async function AboutPage() {
@@ -31,7 +34,7 @@ export default async function AboutPage() {
         <div className="mx-auto max-w-4xl px-6 text-center">
           <FadeIn>
             <EyebrowHeading>{settings.storyEyebrow}</EyebrowHeading>
-            <SectionHeading className="mt-4">{settings.storyHeading}</SectionHeading>
+            <SectionHeading as="h1" className="mt-4">{settings.storyHeading}</SectionHeading>
             <p className="mx-auto mt-6 max-w-2xl text-lg text-ink/70">{settings.storyBody}</p>
           </FadeIn>
         </div>

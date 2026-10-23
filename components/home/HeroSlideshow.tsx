@@ -27,8 +27,9 @@ export function HeroSlideshow({ images }: { images: string[] }) {
           <Image
             key={src}
             src={src}
-            alt=""
+            alt={i === 0 ? "Retouch Africa community and workshop moments" : ""}
             fill
+            sizes="100vw"
             priority={i === 0}
             className={clsx(
               "object-cover object-[70%_center] transition-opacity duration-1000",

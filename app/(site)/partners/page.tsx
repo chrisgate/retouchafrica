@@ -9,7 +9,10 @@ import { getPublishedPartners } from "@/lib/queries";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Partners — Retouch Africa",
+  title: "Partners",
+  description:
+    "The partners and sponsors backing Retouch Africa and its mission to elevate retouching across Africa.",
+  alternates: { canonical: "/partners" },
 };
 
 export default async function PartnersPage() {
@@ -20,14 +23,14 @@ export default async function PartnersPage() {
       <div className="mx-auto max-w-5xl px-6 text-center">
         <FadeIn>
           <EyebrowHeading>Partners &amp; Sponsors</EyebrowHeading>
-          <SectionHeading className="mt-4">Backed By Industry Leaders</SectionHeading>
+          <SectionHeading as="h1" className="mt-4">Backed By Industry Leaders</SectionHeading>
         </FadeIn>
 
         <div className="mt-16 flex flex-wrap items-start justify-center gap-x-14 gap-y-10">
           {partners.map((partner) => (
             <div key={partner.id} className="flex flex-col items-center gap-3 transition-transform hover:scale-105">
               <div className="relative h-16 w-44">
-                <Image src={partner.logoUrl} alt={partner.name} fill className="object-contain" />
+                <Image src={partner.logoUrl} alt={partner.name} fill sizes="160px" className="object-contain" />
               </div>
               <p className="text-sm font-medium text-ink/70">{partner.name}</p>
             </div>

@@ -10,7 +10,10 @@ import { getNowMs } from "@/lib/time";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Workshops — Retouch Africa",
+  title: "Workshops",
+  description:
+    "Hands-on retouching workshops in Africa, led by working industry professionals. See upcoming dates and past workshops.",
+  alternates: { canonical: "/workshop" },
 };
 
 export default async function WorkshopListPage() {
@@ -25,7 +28,7 @@ export default async function WorkshopListPage() {
       <div className="mx-auto max-w-6xl px-6">
         <FadeIn className="text-center">
           <EyebrowHeading>Workshops</EyebrowHeading>
-          <SectionHeading className="mt-4">Learn From Working Professionals</SectionHeading>
+          <SectionHeading as="h1" className="mt-4">Learn From Working Professionals</SectionHeading>
         </FadeIn>
 
         {upcoming.length > 0 && (
@@ -104,7 +107,7 @@ function PastWorkshopCard({ workshop }: { workshop: PastWorkshop }) {
         {cover && (
           <Image
             src={cover}
-            alt=""
+            alt={workshop.title}
             fill
             sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
             className="object-cover transition-transform duration-500 group-hover:scale-105"

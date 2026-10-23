@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Hero } from "@/components/home/Hero";
 import { OurStory } from "@/components/home/OurStory";
 import { UpcomingWorkshop } from "@/components/home/UpcomingWorkshop";
@@ -9,6 +10,10 @@ import { getSiteSettings } from "@/lib/site-settings";
 import { getSocialLinks, getHeroImages, getFeaturedWorkshop } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 export default async function HomePage() {
   const [settings, heroImages, featuredWorkshop, socialLinks] = await Promise.all([

@@ -70,7 +70,15 @@ export function UpcomingWorkshop({ workshop }: { workshop: Workshop | null }) {
           <div className="grid grid-cols-3 gap-3">
             {(collage.length > 0 ? collage : [null, null, null]).map((src, i) => (
               <div key={i} className="relative aspect-[3/4] overflow-hidden bg-ink-soft">
-                {src && <Image src={src} alt="" fill className="object-cover" />}
+                {src && (
+                  <Image
+                    src={src}
+                    alt={`${workshop.title} — workshop photo ${i + 1}`}
+                    fill
+                    sizes="(min-width: 1024px) 18vw, 30vw"
+                    className="object-cover"
+                  />
+                )}
               </div>
             ))}
           </div>

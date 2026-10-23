@@ -9,6 +9,8 @@ import { FadeIn } from "@/components/motion/FadeIn";
 import { getWorkshopBySlug } from "@/lib/queries";
 import { getNowMs } from "@/lib/time";
 import { fillCollageImages } from "@/lib/collage";
+import { JsonLd } from "@/components/shared/JsonLd";
+import { SITE_NAME, SITE_URL, absoluteUrl, truncate } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +21,25 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const workshop = await getWorkshopBySlug(slug);
-  return { title: workshop ? `${workshop.title} — Retouch Africa` : "Workshop — Retouch Africa" };
+  if (!workshop || !workshop.isPublished) return { title: "Workshop" };
+
+  const description = truncate(workshop.summary || workshop.description);
+  const image = workshop.heroImageUrl || workshop.galleryImages[workshop.galleryImages.length - 1];
+  const path = `/workshop/${workshop.slug}`;
+  return {
+    title: workshop.title,
+    description,
+    alternates: { canonical: path },
+    openGraph: {
+      type: "website",
+      siteName: SITE_NAME,
+      title: workshop.title,
+      description,
+      url: path,
+      ...(image ? { images: [{ url: image, alt: workshop.title }] } : {}),
+    },
+    twitter: { card: "summary_large_image", title: workshop.title, description, ...(image ? { images: [image] } : {}) },
+  };
 }
 
 export default async function WorkshopDetailPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -29,13 +49,34 @@ export default async function WorkshopDetailPage({ params }: { params: Promise<{
 
   const isUpcoming = workshop.startDate.getTime() >= getNowMs();
   const collage = fillCollageImages(workshop.galleryImages);
+  const eventImage = workshop.heroImageUrl || workshop.galleryImages[workshop.galleryImages.length - 1];
 
   return (
     <section className="bg-ink py-24">
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "Event",
+          name: workshop.title,
+          description: workshop.summary || workshop.description,
+          startDate: workshop.startDate.toISOString(),
+          ...(workshop.endDate ? { endDate: workshop.endDate.toISOString() } : {}),
+          eventStatus: "https://schema.org/EventScheduled",
+          eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+          location: {
+            "@type": "Place",
+            name: workshop.venueLabel || workshop.locationLabel,
+            address: workshop.locationLabel,
+          },
+          url: absoluteUrl(`/workshop/${workshop.slug}`),
+          ...(eventImage ? { image: [absoluteUrl(eventImage)] } : {}),
+          organizer: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
+        }}
+      />
       <div className="mx-auto grid max-w-6xl gap-16 px-6 lg:grid-cols-2">
         <FadeIn>
           <EyebrowHeading>{workshop.eyebrow}</EyebrowHeading>
-          <SectionHeading className="mt-4 text-paper">{workshop.title}</SectionHeading>
+          <SectionHeading as="h1" className="mt-4 text-paper">{workshop.title}</SectionHeading>
           <p className="mt-6 whitespace-pre-line text-paper/70">{workshop.description}</p>
 
           <div className="mt-8 grid grid-cols-3 gap-6 text-sm">
@@ -74,7 +115,13 @@ export default async function WorkshopDetailPage({ params }: { params: Promise<{
             <div className="grid grid-cols-3 gap-3">
               {collage.map((src, i) => (
                 <div key={i} className="relative aspect-[3/4] overflow-hidden bg-ink-soft">
-                  <Image src={src} alt="" fill className="object-cover" />
+                  <Image
+                    src={src}
+                    alt={`${workshop.title} — workshop photo ${i + 1}`}
+                    fill
+                    sizes="(min-width: 1024px) 18vw, 30vw"
+                    className="object-cover"
+                  />
                 </div>
               ))}
             </div>

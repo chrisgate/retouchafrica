@@ -8,7 +8,8 @@ import { getPublishedGalleryItems } from "@/lib/gallery";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Gallery — Retouch Africa",
+  title: "Gallery",
+  alternates: { canonical: "/gallery" },
   description: "Moments from Retouch Africa workshops, mentorship sessions and community gatherings.",
 };
 

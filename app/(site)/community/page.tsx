@@ -8,7 +8,10 @@ import { getSiteSettings } from "@/lib/site-settings";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Community — Retouch Africa",
+  title: "Community",
+  description:
+    "Join the Retouch Africa community of retouchers, photographers and digital artists across the continent.",
+  alternates: { canonical: "/community" },
 };
 
 export default async function CommunityPage() {
@@ -19,7 +22,7 @@ export default async function CommunityPage() {
       <div className="mx-auto max-w-3xl px-6 text-center">
         <FadeIn>
           <EyebrowHeading>Community</EyebrowHeading>
-          <SectionHeading className="mt-4 text-paper">{settings.footerHeading}</SectionHeading>
+          <SectionHeading as="h1" className="mt-4 text-paper">{settings.footerHeading}</SectionHeading>
           <p className="mx-auto mt-4 max-w-xl text-paper/70">{settings.footerBody}</p>
         </FadeIn>
       </div>

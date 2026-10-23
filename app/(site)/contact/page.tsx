@@ -10,7 +10,10 @@ import { getSocialLinks } from "@/lib/queries";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Contact — Retouch Africa",
+  title: "Contact",
+  description:
+    "Questions about a workshop, partnership or the community? Get in touch with the Retouch Africa team.",
+  alternates: { canonical: "/contact" },
 };
 
 export default async function ContactPage() {
@@ -24,7 +27,7 @@ export default async function ContactPage() {
       <div className="mx-auto grid max-w-5xl gap-16 px-6 lg:grid-cols-2">
         <FadeIn>
           <EyebrowHeading>Contact</EyebrowHeading>
-          <SectionHeading className="mt-4">Get In Touch</SectionHeading>
+          <SectionHeading as="h1" className="mt-4">Get In Touch</SectionHeading>
           <p className="mt-4 max-w-md text-ink/70">
             Questions about a workshop, partnership, or the community? Reach out — we&apos;d love to hear from you.
           </p>

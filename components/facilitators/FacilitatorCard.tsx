@@ -19,7 +19,13 @@ export function FacilitatorCard({
     <div className="flex h-full border border-ink/10 bg-paper-soft">
       <div className="relative w-2/5 flex-none">
         {facilitator.photoUrl && (
-          <Image src={facilitator.photoUrl} alt={facilitator.name} fill className="object-cover" />
+          <Image
+            src={facilitator.photoUrl}
+            alt={facilitator.name}
+            fill
+            sizes="(min-width: 640px) 200px, 50vw"
+            className="object-cover"
+          />
         )}
       </div>
       <div className="flex flex-1 flex-col justify-center gap-2 p-5">

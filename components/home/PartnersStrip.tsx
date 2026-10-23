@@ -20,7 +20,7 @@ export async function PartnersStrip() {
           {partners.map((partner) => (
             <div key={partner.id} className="flex flex-col items-center gap-2 transition-transform hover:scale-105">
               <div className="relative h-14 w-40">
-                <Image src={partner.logoUrl} alt={partner.name} fill className="object-contain" />
+                <Image src={partner.logoUrl} alt={partner.name} fill sizes="160px" className="object-contain" />
               </div>
               <p className="text-xs font-medium uppercase tracking-wide text-ink/60">{partner.name}</p>
             </div>
