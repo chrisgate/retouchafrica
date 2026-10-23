@@ -54,9 +54,15 @@ export default async function WorkshopDetailPage({ params }: { params: Promise<{
           </div>
 
           <div className="mt-10 flex flex-wrap gap-4">
-            <Button href={workshop.registerUrl || "/contact"} variant="solid">
-              Register Now
-            </Button>
+            {isUpcoming ? (
+              <Button href={workshop.registerUrl || "/contact"} variant="solid">
+                Register Now
+              </Button>
+            ) : (
+              <span className="inline-flex items-center border border-paper/20 px-6 py-3 text-xs font-semibold uppercase tracking-[0.15em] text-paper/50">
+                Registration Closed
+              </span>
+            )}
             <Button href="/workshop" variant="outline-light">
               Back to Workshops
             </Button>

@@ -5,6 +5,7 @@ import { Button } from "@/components/shared/Button";
 import { Countdown } from "@/components/shared/Countdown";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { fillCollageImages } from "@/lib/collage";
+import { getNowMs } from "@/lib/time";
 import type { Workshop } from "@prisma/client";
 
 const INFO_ICONS = {
@@ -32,6 +33,7 @@ export function UpcomingWorkshop({ workshop }: { workshop: Workshop | null }) {
   if (!workshop) return null;
 
   const collage = fillCollageImages(workshop.galleryImages);
+  const isUpcoming = workshop.startDate.getTime() >= getNowMs();
 
   return (
     <section className="bg-ink py-24">
@@ -60,7 +62,7 @@ export function UpcomingWorkshop({ workshop }: { workshop: Workshop | null }) {
           </div>
 
           <Button href={`/workshop/${workshop.slug}`} variant="solid" className="mt-10">
-            View Details &amp; Register
+            {isUpcoming ? "View Details & Register" : "View Details"}
           </Button>
         </FadeIn>
 
@@ -72,7 +74,7 @@ export function UpcomingWorkshop({ workshop }: { workshop: Workshop | null }) {
               </div>
             ))}
           </div>
-          <Countdown target={workshop.startDate.toISOString()} />
+          {isUpcoming && <Countdown target={workshop.startDate.toISOString()} />}
         </FadeIn>
       </div>
     </section>
