@@ -4,7 +4,7 @@ import Link from "next/link";
 import { EyebrowHeading } from "@/components/shared/EyebrowHeading";
 import { SectionHeading } from "@/components/shared/SectionHeading";
 import { FadeIn } from "@/components/motion/FadeIn";
-import { prisma } from "@/lib/prisma";
+import { getPublishedWorkshops } from "@/lib/queries";
 import { getNowMs } from "@/lib/time";
 
 export const dynamic = "force-dynamic";
@@ -14,10 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default async function WorkshopListPage() {
-  const workshops = await prisma.workshop.findMany({
-    where: { isPublished: true },
-    orderBy: { startDate: "desc" },
-  });
+  const workshops = await getPublishedWorkshops();
 
   const now = getNowMs();
   const upcoming = workshops.filter((w) => w.startDate.getTime() >= now);

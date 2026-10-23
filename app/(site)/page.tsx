@@ -6,19 +6,16 @@ import { GalleryPreview } from "@/components/home/GalleryPreview";
 import { PartnersStrip } from "@/components/home/PartnersStrip";
 import { CTASection } from "@/components/shared/CTASection";
 import { getSiteSettings } from "@/lib/site-settings";
-import { prisma } from "@/lib/prisma";
+import { getSocialLinks, getHeroImages, getFeaturedWorkshop } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const [settings, heroImages, featuredWorkshop, socialLinks] = await Promise.all([
     getSiteSettings(),
-    prisma.heroImage.findMany({ orderBy: [{ order: "asc" }, { createdAt: "asc" }], select: { imageUrl: true } }),
-    prisma.workshop.findFirst({
-      where: { isFeatured: true, isPublished: true },
-      orderBy: { startDate: "asc" },
-    }),
-    prisma.socialLink.findMany({ where: { facilitatorId: null }, orderBy: { order: "asc" } }),
+    getHeroImages(),
+    getFeaturedWorkshop(),
+    getSocialLinks(),
   ]);
 
   return (

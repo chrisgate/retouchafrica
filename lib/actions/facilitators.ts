@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { Prisma } from "@prisma/client";
 import type { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { invalidateSiteData } from "@/lib/cache";
 import { requireAdmin } from "@/lib/auth";
 import { saveUpload, deleteUpload } from "@/lib/uploads";
 import { facilitatorSchema, socialLinkSchema, formatZodError } from "@/lib/validation/schemas";
@@ -12,6 +13,7 @@ import { facilitatorSchema, socialLinkSchema, formatZodError } from "@/lib/valid
 export type FacilitatorFormState = { error?: string } | undefined;
 
 function revalidateFacilitatorPaths(slug?: string) {
+  invalidateSiteData();
   revalidatePath("/");
   revalidatePath("/facilitators");
   if (slug) revalidatePath(`/facilitators/${slug}`);

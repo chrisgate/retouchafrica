@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { invalidateSiteData } from "@/lib/cache";
 import { getSession } from "@/lib/session";
 import { saveUpload, deleteUpload } from "@/lib/uploads";
 
@@ -42,6 +43,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const image = await prisma.galleryImage.create({ data: { imageUrl } });
+    invalidateSiteData();
     revalidatePath("/");
     revalidatePath("/gallery");
     revalidatePath("/admin/gallery");

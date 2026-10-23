@@ -4,7 +4,7 @@ import { SectionHeading } from "@/components/shared/SectionHeading";
 import { FacilitatorCard } from "@/components/facilitators/FacilitatorCard";
 import { StaggerChildren, StaggerItem } from "@/components/motion/StaggerChildren";
 import { FadeIn } from "@/components/motion/FadeIn";
-import { prisma } from "@/lib/prisma";
+import { getPublishedFacilitators } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
@@ -13,11 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function FacilitatorsPage() {
-  const facilitators = await prisma.facilitator.findMany({
-    where: { isPublished: true },
-    orderBy: { order: "asc" },
-    include: { socialLinks: true },
-  });
+  const facilitators = await getPublishedFacilitators();
 
   return (
     <section className="bg-paper py-24">

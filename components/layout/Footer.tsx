@@ -1,14 +1,11 @@
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
+import { getSocialLinks } from "@/lib/queries";
 import { SocialIcons } from "@/components/shared/SocialIcons";
 import { Logo } from "@/components/shared/Logo";
 import type { SiteSettings } from "@/lib/site-settings";
 
 export async function Footer({ settings }: { settings: SiteSettings }) {
-  const socialLinks = await prisma.socialLink.findMany({
-    where: { facilitatorId: null },
-    orderBy: { order: "asc" },
-  });
+  const socialLinks = await getSocialLinks();
 
   return (
     <footer className="border-t border-paper/10 bg-ink py-10">

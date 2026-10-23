@@ -1,5 +1,6 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
+import { cachedQuery } from "@/lib/cache";
 import { getImageSize } from "@/lib/uploads";
 import type { GalleryImage } from "@prisma/client";
 import type { GalleryItem } from "@/components/gallery/types";
@@ -25,23 +26,23 @@ async function toGalleryItems(images: GalleryImage[]): Promise<GalleryItem[]> {
   );
 }
 
+const getPublishedImages = cachedQuery("published-gallery-images", () =>
+  prisma.galleryImage.findMany({ where: { isPublished: true }, orderBy: PUBLISHED_ORDER }),
+);
+
 /** Published gallery photos, newest first, with the dimensions the layout needs. */
 export async function getPublishedGalleryItems(limit?: number): Promise<GalleryItem[]> {
-  const images = await prisma.galleryImage.findMany({
-    where: { isPublished: true },
-    orderBy: PUBLISHED_ORDER,
-    ...(limit ? { take: limit } : {}),
-  });
-  return toGalleryItems(images);
+  const images = await getPublishedImages();
+  return toGalleryItems(limit ? images.slice(0, limit) : images);
 }
 
 /**
  * `count` published photos chosen at random, in random order. Callers must be
  * dynamically rendered (the home page is) or the pick would be frozen at build.
- * Only ids are loaded to choose from, so this stays cheap for large galleries.
+ * The published list is cached; only the shuffle runs per request.
  */
 export async function getRandomGalleryItems(count: number): Promise<GalleryItem[]> {
-  const all = await prisma.galleryImage.findMany({ where: { isPublished: true }, select: { id: true } });
+  const all = await getPublishedImages();
 
   // Fisher–Yates shuffle, stopping once `count` picks are settled.
   const ids = all.map((image) => image.id);
@@ -53,8 +54,6 @@ export async function getRandomGalleryItems(count: number): Promise<GalleryItem[
   const chosen = ids.slice(0, picks);
   if (chosen.length === 0) return [];
 
-  const images = await prisma.galleryImage.findMany({ where: { id: { in: chosen } } });
-  const byId = new Map(images.map((image) => [image.id, image]));
-  // findMany doesn't preserve the `in` order — restore the shuffled order.
+  const byId = new Map(all.map((image) => [image.id, image]));
   return toGalleryItems(chosen.flatMap((id) => byId.get(id) ?? []));
 }

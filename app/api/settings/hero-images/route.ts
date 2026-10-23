@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { invalidateSiteData } from "@/lib/cache";
 import { getSession } from "@/lib/session";
 import { saveUpload, deleteUpload } from "@/lib/uploads";
 
@@ -20,6 +21,7 @@ async function requireAdminSession() {
 }
 
 function refresh() {
+  invalidateSiteData();
   revalidatePath("/");
   revalidatePath("/admin/settings");
 }

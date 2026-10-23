@@ -2,13 +2,10 @@ import Image from "next/image";
 import { EyebrowHeading } from "@/components/shared/EyebrowHeading";
 import { Button } from "@/components/shared/Button";
 import { FadeIn } from "@/components/motion/FadeIn";
-import { prisma } from "@/lib/prisma";
+import { getPublishedPartners } from "@/lib/queries";
 
 export async function PartnersStrip() {
-  const partners = await prisma.partner.findMany({
-    where: { isPublished: true },
-    orderBy: { order: "asc" },
-  });
+  const partners = await getPublishedPartners();
 
   if (partners.length === 0) return null;
 

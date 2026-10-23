@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { invalidateSiteData } from "@/lib/cache";
 import { requireAdmin } from "@/lib/auth";
 import { saveUpload, deleteUpload } from "@/lib/uploads";
 import { workshopSchema, formatZodError } from "@/lib/validation/schemas";
@@ -11,6 +12,7 @@ import { workshopSchema, formatZodError } from "@/lib/validation/schemas";
 export type WorkshopFormState = { error?: string } | undefined;
 
 function revalidateWorkshopPaths(slug?: string) {
+  invalidateSiteData();
   revalidatePath("/");
   revalidatePath("/workshop");
   if (slug) revalidatePath(`/workshop/${slug}`);

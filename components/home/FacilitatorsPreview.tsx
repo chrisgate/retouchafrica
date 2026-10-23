@@ -4,15 +4,10 @@ import { Button } from "@/components/shared/Button";
 import { FacilitatorCard } from "@/components/facilitators/FacilitatorCard";
 import { GsapScrollReveal } from "@/components/motion/GsapScrollReveal";
 import { FadeIn } from "@/components/motion/FadeIn";
-import { prisma } from "@/lib/prisma";
+import { getPublishedFacilitators } from "@/lib/queries";
 
 export async function FacilitatorsPreview() {
-  const facilitators = await prisma.facilitator.findMany({
-    where: { isPublished: true },
-    orderBy: { order: "asc" },
-    take: 3,
-    include: { socialLinks: true },
-  });
+  const facilitators = await getPublishedFacilitators(3);
 
   if (facilitators.length === 0) return null;
 

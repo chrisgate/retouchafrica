@@ -2,6 +2,7 @@
 
 import { revalidatePath, updateTag } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { invalidateSiteData } from "@/lib/cache";
 import { requireAdmin } from "@/lib/auth";
 import { siteSettingsSchema, formatZodError } from "@/lib/validation/schemas";
 
@@ -23,6 +24,7 @@ export async function updateSiteSettingsAction(
   });
 
   updateTag("site-settings");
+  invalidateSiteData();
   revalidatePath("/");
   revalidatePath("/about");
 

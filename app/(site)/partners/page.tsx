@@ -4,7 +4,7 @@ import { EyebrowHeading } from "@/components/shared/EyebrowHeading";
 import { SectionHeading } from "@/components/shared/SectionHeading";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { ContactForm } from "@/components/forms/ContactForm";
-import { prisma } from "@/lib/prisma";
+import { getPublishedPartners } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
@@ -13,10 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function PartnersPage() {
-  const partners = await prisma.partner.findMany({
-    where: { isPublished: true },
-    orderBy: { order: "asc" },
-  });
+  const partners = await getPublishedPartners();
 
   return (
     <section className="bg-paper py-24">

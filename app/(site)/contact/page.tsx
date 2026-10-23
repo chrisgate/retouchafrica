@@ -5,7 +5,7 @@ import { FadeIn } from "@/components/motion/FadeIn";
 import { ContactForm } from "@/components/forms/ContactForm";
 import { SocialIcons } from "@/components/shared/SocialIcons";
 import { getSiteSettings } from "@/lib/site-settings";
-import { prisma } from "@/lib/prisma";
+import { getSocialLinks } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 export default async function ContactPage() {
   const [settings, socialLinks] = await Promise.all([
     getSiteSettings(),
-    prisma.socialLink.findMany({ where: { facilitatorId: null }, orderBy: { order: "asc" } }),
+    getSocialLinks(),
   ]);
 
   return (

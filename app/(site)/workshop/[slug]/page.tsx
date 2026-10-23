@@ -6,7 +6,7 @@ import { SectionHeading } from "@/components/shared/SectionHeading";
 import { Button } from "@/components/shared/Button";
 import { Countdown } from "@/components/shared/Countdown";
 import { FadeIn } from "@/components/motion/FadeIn";
-import { prisma } from "@/lib/prisma";
+import { getWorkshopBySlug } from "@/lib/queries";
 import { getNowMs } from "@/lib/time";
 import { fillCollageImages } from "@/lib/collage";
 
@@ -18,13 +18,13 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const workshop = await prisma.workshop.findUnique({ where: { slug } });
+  const workshop = await getWorkshopBySlug(slug);
   return { title: workshop ? `${workshop.title} — Retouch Africa` : "Workshop — Retouch Africa" };
 }
 
 export default async function WorkshopDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const workshop = await prisma.workshop.findUnique({ where: { slug } });
+  const workshop = await getWorkshopBySlug(slug);
   if (!workshop || !workshop.isPublished) notFound();
 
   const isUpcoming = workshop.startDate.getTime() >= getNowMs();

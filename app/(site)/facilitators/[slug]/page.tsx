@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { SocialIcons } from "@/components/shared/SocialIcons";
 import { Button } from "@/components/shared/Button";
 import { FadeIn } from "@/components/motion/FadeIn";
-import { prisma } from "@/lib/prisma";
+import { getFacilitatorBySlug } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
@@ -14,16 +14,13 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const facilitator = await prisma.facilitator.findUnique({ where: { slug } });
+  const facilitator = await getFacilitatorBySlug(slug);
   return { title: facilitator ? `${facilitator.name} — Retouch Africa` : "Facilitator — Retouch Africa" };
 }
 
 export default async function FacilitatorDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const facilitator = await prisma.facilitator.findUnique({
-    where: { slug },
-    include: { socialLinks: true },
-  });
+  const facilitator = await getFacilitatorBySlug(slug);
   if (!facilitator || !facilitator.isPublished) notFound();
 
   return (

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { invalidateSiteData } from "@/lib/cache";
 import { requireAdmin } from "@/lib/auth";
 import { saveUpload, deleteUpload } from "@/lib/uploads";
 import { galleryImageSchema, formatZodError } from "@/lib/validation/schemas";
@@ -10,6 +11,7 @@ import { galleryImageSchema, formatZodError } from "@/lib/validation/schemas";
 export type GalleryImageFormState = { error?: string } | undefined;
 
 function revalidateGalleryPaths() {
+  invalidateSiteData();
   revalidatePath("/");
   revalidatePath("/gallery");
   revalidatePath("/admin/gallery");
