@@ -27,7 +27,7 @@ export function HeroSlideshow({ images }: { images: string[] }) {
           <Image
             key={src}
             src={src}
-            alt={i === 0 ? "Retouch Africa community and workshop moments" : ""}
+            alt={`Retouch Africa community and workshop moments, photo ${i + 1}`}
             fill
             sizes="100vw"
             priority={i === 0}

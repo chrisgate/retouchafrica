@@ -29,7 +29,7 @@ export async function GalleryPreview() {
 
         {/* A tidy, uniform contact-sheet of 6 random photos (new pick every load); each links to the full gallery. */}
         <GsapScrollReveal className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
-          {items.map((item) => (
+          {items.map((item, i) => (
             <Link
               key={item.id}
               href="/gallery"
@@ -39,7 +39,7 @@ export async function GalleryPreview() {
             >
               <Image
                 src={item.src}
-                alt={item.caption ?? ""}
+                alt={item.caption || `Retouch Africa gallery photo ${i + 1}`}
                 fill
                 sizes="(min-width: 1024px) 33vw, 50vw"
                 className="object-cover object-[50%_30%] transition-transform duration-700 ease-out group-hover:scale-105"

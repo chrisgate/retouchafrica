@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { clsx } from "clsx";
 import { MotionConfig, motion } from "motion/react";
@@ -8,6 +8,8 @@ import { Lightbox } from "@/components/gallery/Lightbox";
 import type { GalleryItem } from "@/components/gallery/types";
 
 const ALL = "All";
+// Photos are revealed a batch at a time so a big gallery doesn't load hundreds of images up front.
+const BATCH = 24;
 
 /**
  * The public gallery: photos keep their natural proportions (no cropping) in a
@@ -17,6 +19,8 @@ const ALL = "All";
 export function GalleryMasonry({ items }: { items: GalleryItem[] }) {
   const [category, setCategory] = useState(ALL);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [shown, setShown] = useState(BATCH);
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   const categories = useMemo(() => {
     const names = new Set<string>();
@@ -29,6 +33,23 @@ export function GalleryMasonry({ items }: { items: GalleryItem[] }) {
     [items, category],
   );
 
+  const rendered = visible.slice(0, shown);
+  const hasMore = shown < visible.length;
+
+  // Reveal the next batch as the visitor nears the bottom of what's rendered.
+  useEffect(() => {
+    const node = sentinelRef.current;
+    if (!node || !hasMore) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) setShown((n) => n + BATCH);
+      },
+      { rootMargin: "800px 0px" },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [hasMore, shown]);
+
   return (
     <MotionConfig reducedMotion="user">
       {categories.length > 0 && (
@@ -37,7 +58,10 @@ export function GalleryMasonry({ items }: { items: GalleryItem[] }) {
             <button
               key={name}
               type="button"
-              onClick={() => setCategory(name)}
+              onClick={() => {
+                setCategory(name);
+                setShown(BATCH);
+              }}
               aria-pressed={category === name}
               className={clsx(
                 "border px-5 py-2 text-xs font-semibold uppercase tracking-[0.15em] transition-colors",
@@ -53,7 +77,7 @@ export function GalleryMasonry({ items }: { items: GalleryItem[] }) {
       )}
 
       <div className="columns-2 gap-3 sm:gap-4 lg:columns-3 xl:columns-4">
-        {visible.map((item, i) => (
+        {rendered.map((item, i) => (
           <motion.div
             key={item.id}
             initial={{ opacity: 0, y: 24 }}
@@ -71,7 +95,7 @@ export function GalleryMasonry({ items }: { items: GalleryItem[] }) {
             >
               <Image
                 src={item.src}
-                alt={item.caption ?? ""}
+                alt={item.caption || `Retouch Africa gallery photo ${i + 1}`}
                 width={item.width}
                 height={item.height}
                 sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, 50vw"
@@ -89,6 +113,18 @@ export function GalleryMasonry({ items }: { items: GalleryItem[] }) {
           </motion.div>
         ))}
       </div>
+
+      {hasMore && (
+        <div ref={sentinelRef} className="mt-12 flex justify-center">
+          <button
+            type="button"
+            onClick={() => setShown((n) => n + BATCH)}
+            className="border border-paper/20 px-6 py-3 text-xs font-semibold uppercase tracking-[0.15em] text-paper/70 transition-colors hover:border-gold hover:text-gold"
+          >
+            Load more photos
+          </button>
+        </div>
+      )}
 
       {openIndex !== null && visible[openIndex] && (
         <Lightbox
