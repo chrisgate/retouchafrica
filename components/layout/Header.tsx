@@ -19,7 +19,7 @@ export function Header({ isAdmin = false }: { isAdmin?: boolean }) {
           <Logo variant="dark" className="h-10 w-auto" />
         </Link>
 
-        <nav className="hidden items-center gap-6 lg:flex">
+        <nav className="hidden items-center gap-6 min-[1180px]:flex">
           {NAV_LINKS.map((link) => {
             const isActive = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
             return (
@@ -44,7 +44,7 @@ export function Header({ isAdmin = false }: { isAdmin?: boolean }) {
           })}
         </nav>
 
-        <div className="hidden flex-none items-center gap-3 lg:flex">
+        <div className="hidden flex-none items-center gap-3 min-[1180px]:flex">
           {isAdmin && (
             <Link
               href="/admin"

@@ -10,7 +10,7 @@ export function MobileNav({ isAdmin = false }: { isAdmin?: boolean }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="lg:hidden">
+    <div className="min-[1180px]:hidden">
       <button
         aria-label={open ? "Close menu" : "Open menu"}
         onClick={() => setOpen((v) => !v)}
